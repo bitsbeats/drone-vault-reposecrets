@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bitsbeats/drone-vault-reposecrets/internal/config"
-	"github.com/bitsbeats/drone-vault-reposecrets/internal/plugin"
+	"github.com/bitsbeats/drone-vault-reposecrets/pkg/plugin"
 )
 
 func main() {

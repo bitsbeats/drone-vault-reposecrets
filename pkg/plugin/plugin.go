@@ -124,15 +124,16 @@ func (p *Plugin) loadSecret(ctx context.Context, name, repo string) (secret inte
 
 	token, err := p.loadVaultToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to fetch token: %s", err)
 	}
 	apiClient.SetToken(token)
 
 	path := fmt.Sprintf(p.secretPath, repo)
 	vaultSecret, err := apiClient.Logical().Read(path)
 	if err != nil {
-		return nil, fmt.Errorf("unable to fetch secret %q from vault", path)
+		return nil, fmt.Errorf("unable to fetch secret: %s", err)
 	}
+	p.log.Errorf("%+v", vaultSecret)
 	data, ok := vaultSecret.Data["data"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("only kv2 is supported")
@@ -149,7 +150,7 @@ func (p *Plugin) loadVaultToken(ctx context.Context) (token string, err error) {
 		p.vaultRoleID, p.vaultSecretID,
 	))
 	url := fmt.Sprintf("%s/v1/auth/approle/login", p.vaultAddr)
-	tokenReq, err := http.NewRequestWithContext(ctx, "GET", url, body)
+	tokenReq, err := http.NewRequestWithContext(ctx, "POST", url, body)
 	if err != nil {
 		return "", fmt.Errorf("unable to create request to fetch vault token: %s", err)
 	}
@@ -158,6 +159,7 @@ func (p *Plugin) loadVaultToken(ctx context.Context) (token string, err error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to fetch vault token: %s", err)
 	}
+
 	tl := &tokenLoader{}
 	err = json.NewDecoder(resp.Body).Decode(tl)
 	if err != nil {
