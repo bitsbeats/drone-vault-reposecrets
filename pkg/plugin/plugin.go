@@ -133,7 +133,10 @@ func (p *Plugin) loadSecret(ctx context.Context, name, repo string) (secret inte
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch secret: %s", err)
 	}
-	p.log.Errorf("%+v", vaultSecret)
+	if vaultSecret == nil {
+		return nil, fmt.Errorf("secret value is nil")
+	}
+
 	data, ok := vaultSecret.Data["data"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("only kv2 is supported")
