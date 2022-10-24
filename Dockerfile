@@ -14,4 +14,5 @@ RUN go build -o drone-vault-reposecrets .
 
 FROM scratch
 COPY --from=builder /app/drone-vault-reposecrets /plugin
+COPY --from=builder /etc/ssl/cert.pem /etc/ssl/cert.pem
 ENTRYPOINT ["/plugin"]
