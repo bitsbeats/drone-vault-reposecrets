@@ -20,6 +20,11 @@ func main() {
 		logger.WithError(err).Fatalf("unable to parse environment")
 	}
 
+	if cfg.Debug {
+		logger.SetLevel(log.DebugLevel)
+		logger.Debugf("enabled debug log")
+	}
+
 	p, err := plugin.New(
 		plugin.WithLogger(logger),
 		plugin.WithSecretPath(cfg.VaultSecretPath),

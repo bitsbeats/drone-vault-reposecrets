@@ -5,6 +5,7 @@ type (
 	Config struct {
 		Secret string `envconfig:"PLUGIN_SECRET"`
 		Listen string `envconfig:"PLUGIN_LISTEN" default:":8080"`
+		Debug  bool   `envconfig:"PLUGIN_DEBUG"`
 
 		VaultSecretPath string `envconfig:"VAULT_SECRET_PATH" required:"true"`
 
