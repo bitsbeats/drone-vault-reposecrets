@@ -55,6 +55,7 @@ type handler struct {
 }
 
 func (p *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p.logger.Debugf("received request")
 	signature, err := httpsignatures.FromRequest(r)
 	if err != nil {
 		p.logger.Debugf("secrets: invalid or missing signature in http.Request")
@@ -81,6 +82,8 @@ func (p *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Input", http.StatusBadRequest)
 		return
 	}
+
+	p.logger.Debugf("fetching secrets for %q", req.Name)
 
 	secret, err := p.plugin.Find(r.Context(), req)
 	if err != nil {
