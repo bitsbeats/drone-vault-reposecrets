@@ -1,0 +1,24 @@
+FROM golang:1.19-alpine as builder
+
+RUN true \
+    && apk add --no-cache ca-certificates
+
+ADD . /app
+WORKDIR /app
+
+ENV CGO_ENABLED=0
+
+RUN go build -o drone-vault-reposecrets .
+
+# ---
+
+ARG VERSION=1
+FROM us-docker.pkg.dev/berglas/berglas/berglas as berglas
+
+# ---
+
+FROM scratch
+COPY --from=builder /app/drone-vault-reposecrets /plugin
+COPY --from=builder /etc/ssl/cert.pem /etc/ssl/cert.pem
+COPY --from=berglas /bin/berglas /bin/berglas
+ENTRYPOINT ["/plugin"]
